@@ -5,7 +5,29 @@ import matplotlib as mplt
 import mpl_toolkits as toolkits
 import mpl_toolkits.axes_grid.inset_locator as insetter
 
+def activation_jump(z_val): #z_val is a vector
+    #jump activation
+    py_results = []
+    #first way 
+    # for z in z_val:
+    #     if z>0:
+    #         py_results.append(1)
+    #     else:
+    #         py_results.append(0)
+    
+    #second way
+    py_results = z_val>0 #becomes an array of [true,true,false.....] values
+    res = np.array(py_results,dtype=float)
+    return res
+
+def get_z(y_in,w,b):
+    z_val = np.dot(y_in,w)+b
+    return z_val
+
 def apply_layer(y_in, w, b, activation):
+    return apply_layer_get_z(y_in, w, b, activation)[0]
+
+def apply_layer_get_z(y_in, w, b, activation):
     """
     go from one layer to the next given 
     w = weigth matrix shape [nuerons_in x neurons out]
@@ -15,10 +37,27 @@ def apply_layer(y_in, w, b, activation):
     returns the values of the output neoruons in the next layer as matrix
     shape [batch_size,n_nerouns_out]
     """
-    z = np.dot(y_in, w) + b
-    y_next_layer_out = np.empty(len(z))
+    y_in = np.array(y_in)
+    w = np.array(w)
+    ##helpful inside of visualization code
+    if len(w.shape) == 1 and w.shape[0] != y_in.shape[0]:
+        #w shape = 1, means it is a vector but it must be a matrix
+        #if we are here, so we flipped the inputting of (y_in, w) so we try flipping them
+        #rather than crashing
+        #print("Before :: ",w.shape,"x",y_in.shape)
+        c = y_in
+        y_in = w
+        w = c
+        #print("After :: ",w.shape,"x",y_in.shape)
 
-    if activation == "sig" or activation == "sigmoid":
+
+    z = np.dot(w,y_in) + b
+    #print(z)
+
+    y_next_layer_out = np.empty(len(z))
+    if callable(activation):
+        y_next_layer_out = activation(z)
+    elif activation == "sig" or activation == "sigmoid":
         y_next_layer_out = (1.0/(1+np.exp(-z)))
     elif activation == "jump":
         y_next_layer_out = np.array(z > 0, dtype="float")
@@ -26,8 +65,8 @@ def apply_layer(y_in, w, b, activation):
         y_next_layer_out = z
     elif activation.lower() == "relu":
         y_next_layer_out = ((z > 0)*z)
-    return y_next_layer_out
-
+    
+    return [y_next_layer_out,z]
 
 def apply_net(y_in, weigths, biases, activations):
     """
