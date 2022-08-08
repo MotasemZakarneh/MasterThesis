@@ -5,6 +5,9 @@ import matplotlib as mplt
 import mpl_toolkits as toolkits
 import mpl_toolkits.axes_grid.inset_locator as insetter
 
+def test_implementation():
+    print("JG_Helpers Was Imported Properly")
+
 def activation_jump(z_val): #z_val is a vector
     #jump activation
     py_results = []
@@ -38,20 +41,14 @@ def apply_layer_get_z(y_in, w, b, activation):
     shape [batch_size,n_nerouns_out]
     """
     y_in = np.array(y_in)
-    w = np.array(w)
-    ##helpful inside of visualization code
-    if len(w.shape) == 1 and w.shape[0] != y_in.shape[0]:
-        #w shape = 1, means it is a vector but it must be a matrix
-        #if we are here, so we flipped the inputting of (y_in, w) so we try flipping them
-        #rather than crashing
-        #print("Before :: ",w.shape,"x",y_in.shape)
-        c = y_in
-        y_in = w
-        w = c
-        #print("After :: ",w.shape,"x",y_in.shape)
 
-
-    z = np.dot(w,y_in) + b
+    #if we have a single layer
+    if len(y_in.shape) == 1: 
+        z = np.dot(w,y_in) + b
+    #if we have many layers, we flip them, because y_in is a matrix
+    else: 
+        z = np.dot(y_in,w) + b
+    
     #print(z)
 
     y_next_layer_out = np.empty(len(z))
