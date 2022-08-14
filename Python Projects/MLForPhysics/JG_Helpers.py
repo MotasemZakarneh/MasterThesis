@@ -107,6 +107,33 @@ def plot_neuron(ax, X, Y, B, size=50, vmax=1.0, col=[1, 0.3, 0,1], z_order=15):
     pass
 
 
+def XOR2D(x,y):
+    # recall:
+    #z = dot(wjk,yk1) + bj
+    #j = output
+    #k = input
+
+    # solution
+    # let there be 2 intermediate neurons such that
+    #       *               #output (fz) jump
+    #    *     *         #hidden layer of neurons
+    #     *   *             #input neurons
+
+    y_in = [x,y]
+
+    weigths_hidden = [
+        # n1_weigth,n2_weigth
+        [1.0, 1.0],  # weigths to first neuron in hidden layer
+        [-1.0, -1.0],  # weigths to second neuron in hidden layer
+    ]
+    biases_hidden = [-0.5,1.5]
+    res = apply_layer(y_in, weigths_hidden, biases_hidden, "jump")
+    weigth_to_out = [1.0,1.0]
+    biases_out = [-1.5]
+    res2 = apply_layer(res,weigth_to_out,biases_out,"jump")
+    return res2
+
+
 ##################################################
 #Region Start
 #Helper Functions Enclosed By This Region 
